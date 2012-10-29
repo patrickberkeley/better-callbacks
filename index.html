@@ -4,16 +4,16 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>reveal.js - The HTML Presentation Framework</title>
+		<title>Better Callbacks with Deferred Object</title>
 
-		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-		<meta name="author" content="Hakim El Hattab">
+		<meta name="description" content="Introduction and examples of deferred object. ">
+		<meta name="author" content="Patrick Berkeley">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="css/theme/beige.css" id="theme">
 
 		<!-- For syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -36,23 +36,94 @@
 			<div class="slides">
 
 				<section>
-					<h1>Reveal.js</h1>
-					<h3>HTML Presentations Made Easy</h3>
+					<h1>Deferred Object</h1>
+					<h3>Ground rules and Use Cases</h3>
 				</section>
 
 				<section>
-					<h2>Heads Up</h2>
-					<p>
-						reveal.js is a framework for easily creating beautiful presentations using HTML. You'll need a browser with
-						support for CSS 3D transforms to see it in its full glory.
-					</p>
-					<p>
-						<i><small>- <a href="http://hakim.se">Hakim El Hattab</a> / <a href="http://twitter.com/hakimel">@hakimel</a></small></i>
-					</p>
+          <section>
+            <h1>Ground Rules</h1>
+          </section>
+          <section>
+            <h2>An object full of function</h2>
+            <pre><code>
+  $.Deferred = {
+    always: function() {},
+    done: function() {},
+    fail: function() {},
+    notify: function() {},
+    notifyWith: function() {},
+    pipe: function() {},
+    progress: function() {},
+    promise: function() {},
+    reject: function() {},
+    rejectWith: function() {},
+    resolve: function() {},
+    resolveWith: function() {},
+    state: function() {},
+    then: function() {},
+  }
+            </code></pre>
+          </section>
+          <section>
+            <h2>done, fail, always, then</h2>
+            <pre><code>
+  var deferred = $.Deferred();
+  deferred.done(function() {
+    console.log("I get called when things go well.");
+  });
+  deferred.fail(function() {
+    console.log("I get called when things fall apart.");
+  });
+  deferred.always(function() {
+    console.log("I'm so popular, I get called no matter what.");
+  });
+  // Shorthand
+  deferred.then(done, fail, always)
+            </code></pre>
+          </section>
+				</section>
 
-					<aside class="notes">
-						Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes window (hit 's' on your keyboard).
-					</aside>
+				<section>
+          <section>
+            <h3>Use Case #1</h3>
+            <h1>Nested Asynchronous Requests</h1>
+          </section>
+					<section data-state="alert">
+            <h2>Nested Requests</h2>
+            <pre><code>
+  $.get(
+    "api/data",
+    function(resp) {
+      // Do something smart here...
+      // ...another request that depends on `resp`.
+      $.get(
+        'api/more-data',
+        function(resp) {
+          // Do something smart here...
+          // ...another request that depends on `resp`.
+        }
+      )
+    }
+  );
+            </code></pre>
+          </section>
+          <section date-state="soothe">
+            <h2>Using `$.when()`</h2>
+            <pre><code>
+  $.when($.get('api/data'))
+    .then(function(resp) {
+      // Do something smart here...
+    })
+    .then(function(resp) {
+      // Do something smart here...
+    });
+            </code></pre>
+          </section>
+        </section>
+
+				<section>
+					<h2>Use Case: Caching</h2>
 				</section>
 
 				<!-- Example of nested vertical slides -->
@@ -351,8 +422,8 @@ function linkify( selector ) {
 				progress: true,
 				history: true,
 
-				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+				theme: 'beige', // available themes are in /css/theme
+				transition: 'linear', // default/cube/page/concave/zoom/linear/none
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
@@ -360,6 +431,7 @@ function linkify( selector ) {
 					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
 					{ src: 'lib/js/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
 					{ src: 'lib/js/data-markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/js/jquery-1.8.2.js' },
 					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
 					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 				]
