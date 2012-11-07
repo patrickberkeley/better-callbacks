@@ -6,5 +6,5 @@ A presentation on JavaScript deferred object
 
 MIT licensed
 
-Copyright (C) 2011-2012 Hakim El Hattab, http://hakim.se
+Copyright (C) 2012 Patrick Berkeley
 
