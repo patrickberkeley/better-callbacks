@@ -285,7 +285,7 @@
             </code></pre>
           </section>
           <section>
-            <h2>Deferred sequencing</h2>
+            <h2>Sequencing</h2>
             <pre><code>
   var req1 = $.get('api1/data');
   var req2 = $.get('api2/data');
@@ -319,7 +319,7 @@
             </code></pre>
           </section>
           <section>
-            <h2>Deferred Parallelization</h2>
+            <h2>Parallelization</h2>
             <pre><code>
   $.when(
     $.get('api1/data'),
@@ -345,7 +345,7 @@
             </code></pre>
           </section>
           <section>
-            <h2>Create your own deferred</h2>
+            <h2>Create your own</h2>
             <pre><code>
   function showSpinner(){
     var deferred = $.Deferred();
