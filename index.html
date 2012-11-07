@@ -355,7 +355,7 @@
   function disableInputs(){ /* Disable form, return promise */ }
   function postData(){ return $.post('api/'); }
 
-  $.when(showSpinner, disableInputs, postData)
+  $.when(showSpinner, disableInputs, postData, {random: 'obj'})
     .done(function() { /* Clear form */ })
     .fail(function() { /* Don't clear form, show error */ })
     .always(function() { /* Hide spinner, re-enable form */ });
