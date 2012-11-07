@@ -37,32 +37,113 @@
 
 				<section>
 					<h1>Deferred Object</h1>
-					<h3>Ground rules and Use Cases</h3>
 				</section>
 
-				<section>
+        <section>
           <section>
-            <h1>Ground Rules</h1>
+            <h1>What's the problem?</h1>
+            <img class='fragment' src='images/async-is-so-hard.jpg' alt='Async is so hard.' />
           </section>
           <section>
-            <h2>An object full of function</h2>
-            <pre><code>
-  $.Deferred = {
-    always: function() {},
-    done: function() {},
-    fail: function() {},
-    notify: function() {},
-    notifyWith: function() {},
-    pipe: function() {},
-    progress: function() {},
-    promise: function() {},
-    reject: function() {},
-    rejectWith: function() {},
-    resolve: function() {},
-    resolveWith: function() {},
-    state: function() {},
-    then: function() {},
+            <p>It all starts with an innocent little ajax request:</p>
+            <pre class='fragment'><code>
+  var data;
+
+  $.get('api/data', function(resp) {
+    data = resp.data;
+  });
+
+  doSomethingFancyWithData(data);
+            </code></pre>
+          </section>
+          <section>
+            <img src='images/oh-god-why.png' alt='Oh god why.' />
+            <h1 class='fragment'>Where's my data?</h2>
+          </section>
+          <section>
+            <img src='images/picard-facepalm.jpg' alt='Picard facepalm.' />
+          </section>
+          <section>
+            <h1>Asychronicity</h1>
+            <ul>
+              <li class='fragment'>Sequencing is hard and leads to:
+                <ul>
+                  <li class='fragment'>Continuation Passing Style (CPS).</li>
+                  <li class='fragment'>Deep nesting.</li>
+                  <li class='fragment'>'Callback hell'.</li>
+                </ul>
+              </li>
+              <li class='fragment'>Parallelizing is even harder.</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Sequencing</h2>
+            <pre class='fragment'><code>
+  // Demonstrates nesting, CPS, 'callback hell'
+  //
+  $.get('api1/data', function(resp1) {
+    // Next that depended on the first response.
+    $.get('api2/data', function(resp2) {
+      // Next request that depended on the second response.
+      $.get('api3/data', function(resp3) {
+        // Next request that depended on the third response.
+        $.get(); // ... you get the idea.
+      });
+    });
+  });
+            </code></pre>
+          </section>
+          <section>
+            <h2>Parallelizing</h2>
+            <pre class='fragment'><code>
+  $.get('api1/data', function(resp1) { trackMe(); });
+  $.get('api2/data', function(resp2) { trackMe(); });
+  $.get('api3/data', function(resp3) { trackMe(); });
+
+  var trackedCount = 0;
+  function trackMe() {
+    ++trackedCount;
+    if (trackedCount === 3) {
+      doSomethingThatNeededAllThree();
+    }
   }
+            </code></pre>
+          </section>
+          <section>
+            <img src='images/fuuuuuuu.png' alt='FUUUUUUUUUUUUUU.' />
+            <h1 class='fragment'>Give me something better.</h1>
+          </section>
+        </section>
+				<section>
+          <section>
+            <h1>The Players</h1>
+            <pre class='fragment'><code>
+  // The deferred object itself.
+  var def = $.Deferred;
+            </code></pre>
+            <pre class='fragment'><code>
+  // And the deferred's promise object.
+  def.promise();
+            </code></pre>
+          </section>
+          <section>
+            <h2>$.Deferred()</h2>
+            <pre><code>
+  def;
+  > { always: function() {},
+      done: function() {},
+      fail: function() {},
+      notify: function() {},
+      notifyWith: function() {},
+      pipe: function() {},
+      progress: function() {},
+      promise: function() {},
+      reject: function() {},
+      rejectWith: function() {},
+      resolve: function() {},
+      resolveWith: function() {},
+      state: function() {},
+      then: function() {} }
             </code></pre>
           </section>
           <section>
@@ -70,21 +151,31 @@
             <pre><code>
   // A read-only version of the deferred object;
   // returned from a jQuery $.ajax() call.
-  var deferred = $.Deferred();
-  var promise = deferred.promise();
-  Object.keys(promise);
-  > ["state", "always", "then", "promise", "pipe", "done", "fail", "progress"]
+  def.promise();
+  > { always: function() {},
+      done: function() {},
+      fail: function() {},
+      pipe: function() {},
+      progress: function() {},
+      promise: function() {},
+      state: function() {},
+      then: function() {} }
             </code></pre>
+          </section>
+        </section>
+				<section>
+          <section>
+            <h1>The Writers</h1>
           </section>
           <section>
             <h2>resolve()</h2>
             <pre><code>
   var deferred = $.Deferred();
-  deferred.state();
+  deferred.promise().state();
   > "pending"
 
   deferred.resolve();
-  deferred.state();
+  deferred.promise().state();
   > "resolved"
             </code></pre>
           </section>
@@ -92,13 +183,35 @@
             <h2>reject()</h2>
             <pre><code>
   var deferred = $.Deferred();
-  deferred.state();
+  deferred.promise().state();
   > "pending"
 
   deferred.reject();
-  deferred.state();
+  deferred.promise().state();
   > "rejected"
             </code></pre>
+          </section>
+          <section>
+            <h2>pipe()</h2>
+            <pre><code>
+  var deferred = $.Deferred();
+  deferred.pipe(
+    function(resp) {
+      console.log("I filter done responses", resp);
+    },
+    function(resp) {
+      console.log("I filter fail responses", resp);
+    },
+    function(resp) {
+      console.log("I filter progress responses", resp);
+    }
+  );
+            </code></pre>
+          </section>
+        </section>
+				<section>
+          <section>
+            <h1>The Readers</h1>
           </section>
           <section>
             <h2>done()</h2>
@@ -151,57 +264,69 @@
   );
             </code></pre>
           </section>
-          <section>
-            <h2>pipe()</h2>
-            <pre><code>
-  var deferred = $.Deferred();
-  deferred.pipe(
-    function(resp) {
-      console.log("I filter done responses", resp);
-    },
-    function(resp) {
-      console.log("I filter fail responses", resp);
-    },
-    function(resp) {
-      console.log("I filter progress responses", resp);
-    }
-  );
-            </code></pre>
-          </section>
 				</section>
 
 				<section>
           <section>
-            <h1>Use Cases</h1>
+            <h1>How does it solve our problems?</h1>
           </section>
-          <section>
-            <h2>Requisite requests</h2>
+          <section data-state='alert'>
+            <h2>Sequencing mess</h2>
             <pre><code>
-  $.when($.get('api1/data'), $.get('api2/data'), { key: 'value' })
-    .then(
-      function(resp1, resp2, resp3) {
-        // Do this if all requests succeed.
-      },
-      function(resp1, resp2, resp3) {
-        // Do this if any request fails.
-      },
-      function(resp1, resp2, resp3) {
-        // Do this after all requests succeed or one fails.
-      }
-    );
+  $.get('api1/data', function(resp1) {
+    // Next that depended on the first response.
+    $.get('api2/data', function(resp2) {
+      // Next request that depended on the second response.
+      $.get('api3/data', function(resp3) {
+        // Next request that depended on the third response.
+      });
+    });
+  });
             </code></pre>
           </section>
           <section>
-            <h2>Decoupled callbacks</h2>
+            <h2>Deferred sequencing</h2>
             <pre><code>
-  var req = $.ajax('api/data')
-    .done(function(data) {
-      // Do something in the same location the request was made.
-    });
+  var req1 = $.get('api1/data');
+  var req2 = $.get('api2/data');
+  var req3 = $.get('api3/data');
 
-  req.done(function(data) {
+  req1.then(function(req1Data) {
+    return req2;
+  }).then(function(req2Data) {
+    return req3;
+  });
+
+  req2.then(function(req2Data) {
     // Do something somewhere entirely different.
   });
+            </code></pre>
+          </section>
+          <section data-state='alert'>
+            <h2>Ugly Parallel Requests</h2>
+            <pre><code>
+  $.get('api1/data', function(resp1) { trackMe(); });
+  $.get('api2/data', function(resp2) { trackMe(); });
+  $.get('api3/data', function(resp3) { trackMe(); });
+
+  var trackedCount = 0;
+  function trackMe() {
+    ++trackedCount;
+    if (trackedCount === 3) {
+      doSomethingThatNeededAllThree();
+    }
+  }
+            </code></pre>
+          </section>
+          <section>
+            <h2>Deferred Parallelization</h2>
+            <pre><code>
+  $.when(
+    $.get('api1/data'),
+    $.get('api2/data'),
+    $.get('api3/data'),
+    { key: 'value' }
+  ).done();
             </code></pre>
           </section>
           <section>
@@ -223,10 +348,27 @@
 
 				<section>
           <section>
-            <h2>Summary</h2>
+            <h1>Summary</h1>
             <ul>
-              <li class='fragment'>Really good when you need to guarantee something else has completed before proceeding.</li>
-              <li class='fragment'>Good for decoupling your code.
+              <li class='fragment'>Really good when you need to guarantee something else has completed before proceeding, either one after another or all together.</li>
+              <li class='fragment'>Improves code composition:
+                <ul>
+                  <li class='fragment'>flat</li>
+                  <li class='fragment'>decoupled</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+				</section>
+				<section>
+          <section>
+            <h2>Resources</h2>
+            <ul>
+              <li><a href="http://www.slideshare.net/domenicdenicola/callbacks-promises-and-coroutines-oh-my-the-evolution-of-asynchronicity-in-javascript">Callbacks, promises, and coroutines</a></li>
+              <li><a href="https://github.com/kriskowal/q/wiki/Coming-from-jQuery">Q.js from jQuery</a></li>
+              <li><a href="http://msdn.microsoft.com/en-us/magazine/gg723713.aspx">Creating Responsive Applications Using jQuery Deferred and Promises</a></li>
+              <li><a href="http://www.html5rocks.com/en/tutorials/async/deferred/">ASYNCH JS: THE POWER OF $.DEFERRED</a></li>
+              <li><a href="http://idlebrains.org/tutorials/jquery/deferred-and-promise-methods/jquery-exploring-deferred-and-promise/">jQuery : Exploring Deferred and Promise methods</a></li>
             </ul>
           </section>
 				</section>

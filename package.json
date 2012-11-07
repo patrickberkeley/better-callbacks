@@ -1,8 +1,8 @@
 {
-	"author": "Hakim El Hattab",
-	"name": "reveal.js",
-	"description": "HTML5 Slideware with Presenter Notes",
-	"version": "1.5.0",
+	"author": "Patrick Berkeley",
+	"name": "Better Callbacks",
+	"description": "Better callbacks with deferred objects",
+	"version": "0.0.1",
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/hakimel/reveal.js.git"
