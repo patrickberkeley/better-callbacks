@@ -1,5 +1,6 @@
 # Better Callbacks
-## A presentation on JavaScript deferred object
+
+A presentation on JavaScript deferred object
 
 ## License
 
