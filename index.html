@@ -165,7 +165,7 @@
         </section>
 				<section>
           <section>
-            <h1>The Writers</h1>
+            <h1>The Changers</h1>
           </section>
           <section>
             <h2>resolve()</h2>
@@ -211,7 +211,7 @@
         </section>
 				<section>
           <section>
-            <h1>The Readers</h1>
+            <h1>The Responders</h1>
           </section>
           <section>
             <h2>done()</h2>
@@ -344,19 +344,37 @@
   });
             </code></pre>
           </section>
+          <section>
+            <h2>Create your own deferred</h2>
+            <pre><code>
+  function showSpinner(){
+    var deferred = $.Deferred();
+    $('#spinner').fadeIn(1000, deferred.resolve);
+    return deferred.promise();
+  }
+  function disableInputs(){ /* Disable form, return promise */ }
+  function postData(){ return $.post('api/'); }
+
+  $.when(showSpinner, disableInputs, postData)
+    .done(function() { /* Clear form */ })
+    .fail(function() { /* Don't clear form, show error */ })
+    .always(function() { /* Hide spinner, re-enable form */ });
+            </code></pre>
+          </section>
         </section>
 
 				<section>
           <section>
             <h1>Summary</h1>
             <ul>
-              <li class='fragment'>Really good when you need to guarantee something else has completed before proceeding, either one after another or all together.</li>
+              <li class='fragment'>Use a deferred when you need to guarantee something has completed before proceeding.</li>
               <li class='fragment'>Improves code composition:
                 <ul>
                   <li class='fragment'>flat</li>
                   <li class='fragment'>decoupled</li>
                 </ul>
               </li>
+              <li class='fragment'>Good for AJAX and non-AJAX i.e., anything async.</li>
             </ul>
           </section>
 				</section>
