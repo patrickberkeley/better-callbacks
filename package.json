@@ -1,11 +1,11 @@
 {
 	"author": "Patrick Berkeley",
-	"name": "Better Callbacks",
+	"name": "better-callbacks",
 	"description": "Better callbacks with deferred objects",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/hakimel/reveal.js.git"
+    "url": "git://github.com/patrickberkeley/better-callbacks.git"
 	},
 	"engines": {
 		"node": "~0.8.0"
