@@ -349,7 +349,7 @@
             <pre><code>
   function showSpinner(){
     var deferred = $.Deferred();
-    $('#spinner').fadeIn(1000, deferred.resolve);
+    $('#spinner').fadeIn(1000, deferred.resolve());
     return deferred.promise();
   }
   function disableInputs(){ /* Disable form, return promise */ }
